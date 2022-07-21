@@ -12,7 +12,7 @@ func main() {
 	var data interface{}
 	jsonRaw := `
 		{
-        "name": "Banana",
+        "name": "John Doe",
         "points": 200,
         "description": "A banana grown in Ecuador."
     }`
