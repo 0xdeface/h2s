@@ -55,5 +55,4 @@ deploy:
     - sed -i "s/<SMTP_PASSWORD>/${SMTP_PASSWORD}/g" deployment.yaml
     - sed -i "s/<SMTP_SSL>/${SMTP_SSL}/g" deployment.yaml
     - sed -i "s/<SMTP_TSL>/${SMTP_TSL}/g" deployment.yaml
-    - cat deployment.yaml
-    # - kubectl apply -f deployment.yaml
+    - kubectl apply -f deployment.yaml
