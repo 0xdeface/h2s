@@ -29,9 +29,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ build ]
     steps:
-      - uses: actions/checkout@v3
-      - name: create release file
-        run: tar -cvzf release.tar.gz h2s tpls README.md
+      - name: download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: h2s
+      - name: ls dir
+        run: ls
       - name: Release with Notes
         uses: softprops/action-gh-release@v1
         with:
