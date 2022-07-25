@@ -19,7 +19,7 @@ func main() {
 	Close := handleShutdown(ctx, cancel, wg)
 	maker := message_maker.MessageMaker{}
 	emailSender := sender.NewEmailSender()
-	app := domain.NewApp(emailSender, maker)
+	app := domain.NewApp(emailSender, maker, ctx)
 	http.RunServer(ctx, wg, app)
 	wg.Wait()
 	Close()
