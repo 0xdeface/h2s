@@ -5,7 +5,7 @@
 
 h2s is small service for sending email messages. Work with it is very simply.   
 H2S can render html template with your own data and send it to recipient.   
-**First:** Put your template inside `tpls` folder. _H2S support go template syntax._
+**First:** Put your template inside `tpls` folder. _H2S support go template syntax._  
 **Second:** Make http post query with payload to endpoint.
 
 ## Usage

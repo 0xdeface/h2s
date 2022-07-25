@@ -21,7 +21,6 @@ func main() {
 	emailSender := sender.NewEmailSender()
 	app := domain.NewApp(emailSender, maker)
 	http.RunServer(ctx, wg, app)
-
 	wg.Wait()
 	Close()
 	log.Println("Shutdown...")
