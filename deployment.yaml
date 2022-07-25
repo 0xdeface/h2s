@@ -10,7 +10,7 @@ data:
   SMTP_USERNAME: "<SMTP_USERNAME>"
   SMTP_PASSWORD: "<SMTP_PASSWORD>"
   SMTP_SSL: "<SMTP_SSL>"
-  SMTP_TSL: "<SMTP_TSL>"
+  SMTP_TLS: "<SMTP_TSL>"
 ---
 apiVersion: apps/v1
 kind: Deployment
