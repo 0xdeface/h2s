@@ -106,5 +106,6 @@ func NewApp(sender Sender, maker MessageMaker, ctx context.Context) App {
 		queue:       make(chan QueueMessage, 40000),
 		queueResult: make(map[string]ExecutionResult),
 	}
+	go app.Worker(ctx)
 	return app
 }

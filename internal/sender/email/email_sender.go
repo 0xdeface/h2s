@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -50,7 +51,7 @@ func (e Email) Send(subject string, message []byte, from string, to []string) er
 	}
 
 	email := mail.NewMSG()
-	email.SetFrom(fmt.Sprintf("%v <%v>", from, e.c.username))
+	email.SetFrom(fmt.Sprintf("%v <%v>", strings.Replace(from, "@", "_", -1), e.c.username))
 	email.AddTo(to...).
 		SetSubject(subject).
 		SetBody(mail.TextHTML, string(message))

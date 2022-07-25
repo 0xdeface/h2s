@@ -86,7 +86,7 @@ func (h *handler) getResult(ctx *fiber.Ctx) error {
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	ready, err := h.AsyncResult(id.String())
-	return ctx.JSON(fiber.Map{"success": ready, "error": err.Error()})
+	return ctx.JSON(fiber.Map{"success": ready, "error": err})
 }
 
 func (h *handler) sendAsync(ctx *fiber.Ctx) error {
