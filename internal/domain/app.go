@@ -1,11 +1,13 @@
 package domain
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"html/template"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type App struct {
@@ -13,12 +15,32 @@ type App struct {
 	maker  MessageMaker
 }
 
+// Do
+// Синхронная отправка
 func (app *App) Do(payload Payload) error {
 	message, err := app.RenderTemplate(payload)
 	if err != nil {
 		return err
 	}
-	return app.sender.Send(payload.Subject, message, payload.From, payload.To)
+	fnWrap := func(ctx context.Context) error {
+		return app.sender.Send(payload.Subject, message, payload.From, payload.To)
+	}
+	return Retry(fnWrap, 3, time.Second*2)(context.TODO())
+}
+
+// DoAsync
+// Помещает задачу по отправке в очередь и сразу возвращает
+// идентификатор отправки
+func DoAsync(payload Payload) string {
+	go func() {}()
+	return "uniqum identifier"
+}
+
+// AsyncResult
+// Результат выполнения задачи по идентификатору
+// Возвращает готовность задачи и результат
+func AsyncResult(u string) (bool, error) {
+	return false, nil
 }
 func (app *App) RenderTemplate(payload Payload) ([]byte, error) {
 	tplPath, err := normalizePath(payload.TemplateName)

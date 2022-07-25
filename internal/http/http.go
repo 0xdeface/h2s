@@ -20,34 +20,12 @@ func runHttpServer(ctx context.Context, wg *sync.WaitGroup, app domain.App) {
 		ReadTimeout: 10 * time.Second,
 		IdleTimeout: 10 * time.Second,
 	})
+	handlers := handler{App: app}
 	httpSrv.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("index", fiber.Map{"Name": 888})
 	})
-	httpSrv.Post("/", func(ctx *fiber.Ctx) error {
-		var data domain.Payload
-		err := json.Unmarshal(ctx.Body(), &data)
-		if err != nil {
-			return ctx.JSON(fiber.Map{"error": err.Error()})
-		}
-		err = app.Do(data)
-		if err != nil {
-			return ctx.JSON(fiber.Map{"error": err.Error()})
-		}
-		return ctx.JSON(fiber.Map{"success": "true"})
-	})
-	httpSrv.Post("/test", func(ctx *fiber.Ctx) error {
-		var data domain.Payload
-		err := json.Unmarshal(ctx.Body(), &data)
-		if err != nil {
-			return ctx.JSON(fiber.Map{"error": err.Error()})
-		}
-		message, err := app.RenderTemplate(data)
-		if err != nil {
-			return ctx.JSON(fiber.Map{"error": err.Error()})
-		}
-		ctx.WriteString(string(message))
-		return nil
-	})
+	httpSrv.Post("/", handlers.send)
+	httpSrv.Post("/test", handlers.test)
 
 	port := ":8090"
 	go func() {
@@ -66,4 +44,35 @@ func runHttpServer(ctx context.Context, wg *sync.WaitGroup, app domain.App) {
 
 func RunServer(ctx context.Context, wg *sync.WaitGroup, app domain.App) {
 	go runHttpServer(ctx, wg, app)
+}
+
+type handler struct {
+	domain.App
+}
+
+func (h *handler) test(ctx *fiber.Ctx) error {
+	var data domain.Payload
+	err := json.Unmarshal(ctx.Body(), &data)
+	if err != nil {
+		return ctx.JSON(fiber.Map{"error": err.Error()})
+	}
+	message, err := h.RenderTemplate(data)
+	if err != nil {
+		return ctx.JSON(fiber.Map{"error": err.Error()})
+	}
+	ctx.WriteString(string(message))
+	return nil
+}
+
+func (h *handler) send(ctx *fiber.Ctx) error {
+	var data domain.Payload
+	err := json.Unmarshal(ctx.Body(), &data)
+	if err != nil {
+		return ctx.JSON(fiber.Map{"error": err.Error()})
+	}
+	err = h.Do(data)
+	if err != nil {
+		return ctx.JSON(fiber.Map{"error": err.Error()})
+	}
+	return ctx.JSON(fiber.Map{"success": "true"})
 }

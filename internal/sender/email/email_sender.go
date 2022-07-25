@@ -49,9 +49,8 @@ func (e Email) Send(subject string, message []byte, from string, to []string) er
 		return err
 	}
 
-	// New email simple html with inline and CC
 	email := mail.NewMSG()
-	email.SetFrom(fmt.Sprintf("%v <%v>", "SHIO", from))
+	email.SetFrom(fmt.Sprintf("%v <%v>", from, e.c.username))
 	email.AddTo(to...).
 		SetSubject(subject).
 		SetBody(mail.TextHTML, string(message))
