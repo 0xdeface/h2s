@@ -23,6 +23,16 @@ Send email, example with curl
 curl localhost:8090/ --data '{"templateName":"ecommerce.html", "data":{"name":"test1", "sum":"4584", "order":"d-12323", "products":[{"name":"LG TV sdfdsfdsfsdf", "price": "777.0", "quantity":"44", "sum":"3434 руб"},{"name":"Product 2 lololo", "price":"343434", "quantity":"dsfsdfsdf", "sum":"sdfsdf"}]}, "from":"sender@rix.ru", "to":["recipent.khv@gmail.com"],"subject":"Интернет заказ в магазине санремо"}'
 ```
 
+payload requirement fields
+```
+{
+"templateName": "target_template.html",
+"data" : "data for you template",
+"subject" : "email subject",
+"to" :["array of recipients",]
+"from" : "email from"
+}
+```
 __You can test own template without send with localhost:8090/text url__
 
 
