@@ -2,7 +2,7 @@ name: Go
 on:
   push:
     tags:
-        - 'v*'
+      - 'v*'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,11 +30,12 @@ jobs:
     needs: [ build ]
     steps:
       - uses: actions/checkout@v3
-      - name: ls
-        run: ls
+      - name: create release file
+        run: tar -cvzf release.tar.gz h2s tpls README.md
       - name: Release with Notes
         uses: softprops/action-gh-release@v1
         with:
-          files: README.md
+          files: release.tar.gz
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
