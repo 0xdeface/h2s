@@ -1,0 +1,35 @@
+<html>
+<body>
+<table width="800" border="0" cellspacing="0" cellpadding="0" align="center">
+    <tr>
+        <td align="left">
+            <h2>Спасибо за Ваш заказ</h2>
+            <p>
+                <strong>Номер заказа:</strong> {{ .order }} <br>
+                <strong>Статус:</strong> В обработке <br>
+                <strong>Сумма заказа:</strong> {{ .sum }} <br>
+            </p>
+            <h3>Содержимое заказа</h3>
+        </td>
+    </tr>
+</table>
+<table width="800" style="border:1px solid #1258ca" align="center" border="1">
+    <tr style="background-color:#0e6ac4; color:#fff; font-size: 18px;" align="center">
+        <td align="center">#</td>
+        <td>Товар</td>
+        <td align="center">Количество</td>
+        <td align="center">Стоимость</td>
+        <td align="center">Сумма</td>
+    </tr>
+    {{ range $i, $a := .products }}
+    <tr>
+        <td align="center">{{ $i }}</td>
+        <td style="height:50px; width: 300px;">{{ $a.name }}</td>
+        <td align="center">{{ $a.quantity }}</td>
+        <td align="center">{{ $a.price }}</td>
+        <td align="center">{{ $a.sum }}</td>
+    </tr>
+    {{ end }}
+</table>
+</body>
+</html>

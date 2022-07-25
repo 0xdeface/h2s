@@ -7,5 +7,12 @@ type Sender interface {
 }
 
 type MessageMaker interface {
-	Make(*template.Template, ...interface{}) ([]byte, error)
+	Make(*template.Template, interface{}) ([]byte, error)
+}
+type Payload struct {
+	TemplateName string      `json:"templateName"`
+	To           []string    `json:"to"`
+	From         string      `json:"from"`
+	Subject      string      `json:"subject"`
+	Data         interface{} `json:"data"`
 }

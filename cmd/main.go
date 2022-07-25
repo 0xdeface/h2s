@@ -1,27 +1,48 @@
 package main
 
 import (
+	"context"
+	"emailer/internal/domain"
+	"emailer/internal/http"
 	"emailer/internal/message_maker"
-	"encoding/json"
-	"fmt"
-	"html/template"
+	sender "emailer/internal/sender/email"
+	"log"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 )
 
 func main() {
-	m := message_maker.MessageMaker{}
-	var data interface{}
-	jsonRaw := `
-		{
-        "name": "John Doe",
-        "points": 200,
-        "description": "A banana grown in Ecuador."
-    }`
-	err := json.Unmarshal([]byte(jsonRaw), &data)
-	if err != nil {
-		fmt.Println(err)
-		return
+	ctx, cancel := context.WithCancel(context.Background())
+	wg := &sync.WaitGroup{}
+	Close := handleShutdown(ctx, cancel, wg)
+	maker := message_maker.MessageMaker{}
+	emailSender := sender.NewEmailSender()
+	app := domain.NewApp(emailSender, maker)
+	http.RunServer(ctx, wg, app)
+
+	wg.Wait()
+	Close()
+	log.Println("Shutdown...")
+
+}
+
+func handleShutdown(ctx context.Context, cancel func(), wg *sync.WaitGroup) (Close func()) {
+	stopCh := make(chan os.Signal, 1)
+	wg.Add(1)
+	signal.Notify(stopCh, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+	s := sync.Once{}
+	go func() {
+		select {
+		case <-stopCh:
+			s.Do(wg.Done)
+			cancel()
+		case <-ctx.Done():
+			s.Do(wg.Done)
+		}
+	}()
+	return func() {
+		close(stopCh)
 	}
-	t, _ := template.New("t1").Parse("sample template {{ .name }}")
-	result, _ := m.Make(t, data)
-	fmt.Println(string(result))
 }
