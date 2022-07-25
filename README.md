@@ -1,4 +1,5 @@
 # H2S [http to smtp]
+[![Go](https://github.com/0xdeface/h2s/actions/workflows/go.yml/badge.svg)](https://github.com/0xdeface/h2s/actions/workflows/go.yml)
 
 ## Description
 
