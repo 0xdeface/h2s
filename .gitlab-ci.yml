@@ -13,14 +13,13 @@ stages:
   - deploy
 test:
   stage: test
-  image: golang:1.16-alpine
+  image: golang:1.18-alpine
   script:
-    - go mod tidy
     - CGO_ENABLED=0 go vet ./...
     - CGO_ENABLED=0 go test ./...
 build_executable:
   stage: build
-  image: golang:1.16-alpine
+  image: golang:1.18-alpine
   script:
     - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo -ldflags '-w -extldflags \"-static\"' -o h2s cmd/main.go
   artifacts:
