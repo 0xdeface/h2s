@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"emailer/internal/domain"
+	"emailer/internal/logger"
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
@@ -41,7 +42,7 @@ func runHttpServer(ctx context.Context, wg *sync.WaitGroup, app domain.App) {
 	log.Println("Stopping http server")
 	err := httpSrv.Shutdown()
 	if err != nil {
-		log.Println(err)
+		logger.ErrorCh <- err
 	}
 }
 
@@ -57,10 +58,12 @@ func (h *handler) test(ctx *fiber.Ctx) error {
 	var data domain.Payload
 	err := json.Unmarshal(ctx.Body(), &data)
 	if err != nil {
+		logger.ErrorCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	message, err := h.RenderTemplate(data)
 	if err != nil {
+		logger.ErrorCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	_, err = ctx.WriteString(string(message))
@@ -71,10 +74,12 @@ func (h *handler) send(ctx *fiber.Ctx) error {
 	var data domain.Payload
 	err := json.Unmarshal(ctx.Body(), &data)
 	if err != nil {
+		logger.ErrorCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	err = h.Do(ctx.Context(), data)
 	if err != nil {
+		logger.ErrorCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	return ctx.JSON(fiber.Map{"success": "true"})
@@ -83,6 +88,7 @@ func (h *handler) getResult(ctx *fiber.Ctx) error {
 	u := ctx.Query("uuid", "")
 	id, err := uuid.Parse(u)
 	if err != nil {
+		logger.ErrorCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	ready, err := h.AsyncResult(id.String())
@@ -93,6 +99,7 @@ func (h *handler) sendAsync(ctx *fiber.Ctx) error {
 	var data domain.Payload
 	err := json.Unmarshal(ctx.Body(), &data)
 	if err != nil {
+		logger.ErrorCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	u := h.DoAsync(data)

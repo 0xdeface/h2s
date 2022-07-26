@@ -4,6 +4,7 @@ import (
 	"context"
 	"emailer/internal/domain"
 	"emailer/internal/http"
+	"emailer/internal/logger"
 	"emailer/internal/message_maker"
 	sender "emailer/internal/sender/email"
 	"log"
@@ -23,6 +24,7 @@ func main() {
 	http.RunServer(ctx, wg, app)
 	wg.Wait()
 	Close()
+	close(logger.ErrorCh)
 	log.Println("Shutdown...")
 
 }
