@@ -15,6 +15,7 @@ import (
 )
 
 func main() {
+	logger.StartLogger()
 	ctx, cancel := context.WithCancel(context.Background())
 	wg := &sync.WaitGroup{}
 	Close := handleShutdown(ctx, cancel, wg)

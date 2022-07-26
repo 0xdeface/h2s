@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/template/html"
 	"github.com/google/uuid"
 	"log"
+	"os"
 	"sync"
 	"time"
 )
@@ -30,8 +31,10 @@ func runHttpServer(ctx context.Context, wg *sync.WaitGroup, app domain.App) {
 	httpSrv.Post("/send-async", handlers.sendAsync)
 	httpSrv.Get("/result", handlers.getResult)
 	httpSrv.Post("/test", handlers.test)
-
 	port := ":8090"
+	if p, exists := os.LookupEnv("HTTP_PORT"); exists {
+		port = p
+	}
 	go func() {
 		log.Printf("Start server at %v\n", port)
 		if err := httpSrv.Listen(port); err != nil {
