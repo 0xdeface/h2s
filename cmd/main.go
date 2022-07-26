@@ -19,7 +19,11 @@ func main() {
 	wg := &sync.WaitGroup{}
 	Close := handleShutdown(ctx, cancel, wg)
 	maker := message_maker.MessageMaker{}
-	emailSender := sender.NewEmailSender()
+	emailSender, err := sender.NewEmailSender()
+	if err != nil {
+		logger.GetLoggerCh() <- err
+		cancel()
+	}
 	app := domain.NewApp(emailSender, maker, ctx)
 	http.RunServer(ctx, wg, app)
 	wg.Wait()
