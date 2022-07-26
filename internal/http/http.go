@@ -22,7 +22,7 @@ func runHttpServer(ctx context.Context, wg *sync.WaitGroup, app domain.App) {
 		ReadTimeout: 10 * time.Second,
 		IdleTimeout: 10 * time.Second,
 	})
-	handlers := handler{App: app}
+	handlers := handler{App: app, errCh: logger.GetLoggerCh()}
 	httpSrv.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("index", fiber.Map{"Name": 888})
 	})
@@ -42,7 +42,7 @@ func runHttpServer(ctx context.Context, wg *sync.WaitGroup, app domain.App) {
 	log.Println("Stopping http server")
 	err := httpSrv.Shutdown()
 	if err != nil {
-		logger.ErrorCh <- err
+		handlers.errCh <- err
 	}
 }
 
@@ -52,18 +52,19 @@ func RunServer(ctx context.Context, wg *sync.WaitGroup, app domain.App) {
 
 type handler struct {
 	domain.App
+	errCh chan error
 }
 
 func (h *handler) test(ctx *fiber.Ctx) error {
 	var data domain.Payload
 	err := json.Unmarshal(ctx.Body(), &data)
 	if err != nil {
-		logger.ErrorCh <- err
+		h.errCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	message, err := h.RenderTemplate(data)
 	if err != nil {
-		logger.ErrorCh <- err
+		h.errCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	_, err = ctx.WriteString(string(message))
@@ -74,12 +75,12 @@ func (h *handler) send(ctx *fiber.Ctx) error {
 	var data domain.Payload
 	err := json.Unmarshal(ctx.Body(), &data)
 	if err != nil {
-		logger.ErrorCh <- err
+		h.errCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	err = h.Do(ctx.Context(), data)
 	if err != nil {
-		logger.ErrorCh <- err
+		h.errCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	return ctx.JSON(fiber.Map{"success": "true"})
@@ -88,7 +89,7 @@ func (h *handler) getResult(ctx *fiber.Ctx) error {
 	u := ctx.Query("uuid", "")
 	id, err := uuid.Parse(u)
 	if err != nil {
-		logger.ErrorCh <- err
+		h.errCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	ready, err := h.AsyncResult(id.String())
@@ -99,7 +100,7 @@ func (h *handler) sendAsync(ctx *fiber.Ctx) error {
 	var data domain.Payload
 	err := json.Unmarshal(ctx.Body(), &data)
 	if err != nil {
-		logger.ErrorCh <- err
+		h.errCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	u := h.DoAsync(data)

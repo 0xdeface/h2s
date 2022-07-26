@@ -1,11 +1,25 @@
 package logger
 
-import "log"
+import (
+	"log"
+	"sync"
+)
 
-var ErrorCh = make(chan error, 10000)
+var (
+	once  sync.Once
+	errCh chan error
+)
 
-func init() {
-	for err := range ErrorCh {
-		log.Println(err.Error())
-	}
+func StartLogger() {
+	go func() {
+		for err := range GetLoggerCh() {
+			log.Println(err.Error())
+		}
+	}()
+}
+func GetLoggerCh() chan error {
+	once.Do(func() {
+		errCh = make(chan error, 100000)
+	})
+	return errCh
 }

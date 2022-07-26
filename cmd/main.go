@@ -24,9 +24,8 @@ func main() {
 	http.RunServer(ctx, wg, app)
 	wg.Wait()
 	Close()
-	close(logger.ErrorCh)
+	defer func() { close(logger.GetLoggerCh()) }()
 	log.Println("Shutdown...")
-
 }
 
 func handleShutdown(ctx context.Context, cancel func(), wg *sync.WaitGroup) (Close func()) {
