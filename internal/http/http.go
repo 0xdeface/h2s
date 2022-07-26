@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/html"
 	"github.com/google/uuid"
 	"log"
@@ -24,6 +25,7 @@ func runHttpServer(ctx context.Context, wg *sync.WaitGroup, app domain.App) {
 		ReadTimeout: 10 * time.Second,
 		IdleTimeout: 10 * time.Second,
 	})
+	httpSrv.Use(recover.New())
 	handlers := handler{App: app, errCh: logger.GetLoggerCh()}
 	httpSrv.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("index", fiber.Map{"Name": 888})
@@ -85,7 +87,7 @@ func (h *handler) send(ctx *fiber.Ctx) error {
 	}
 	err = h.Do(ctx.Context(), data)
 	if err != nil {
-		err := fmt.Errorf("send handler Do err, received %v; %w", data, err)
+		err := fmt.Errorf("send handler Do err, received %+v\n; %w", data, err)
 		h.errCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
@@ -106,7 +108,7 @@ func (h *handler) sendAsync(ctx *fiber.Ctx) error {
 	var data domain.Payload
 	err := json.Unmarshal(ctx.Body(), &data)
 	if err != nil {
-		err := fmt.Errorf("sendAsync handler unmarshal err, received %v; %w", string(ctx.Body()), err)
+		err := fmt.Errorf("sendAsync handler unmarshal err, received %+v\n; %w", string(ctx.Body()), err)
 		h.errCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}

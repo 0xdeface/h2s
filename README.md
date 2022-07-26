@@ -20,6 +20,9 @@ SMTP_USERNAME
 SMTP_PASSWORD
 ```
 
+Additionally, you can set HTTP_PORT variable, if not set default is ":8090". This variable is responsible for the port
+listening port.
+
 ### Required payload fields
 
 ```
