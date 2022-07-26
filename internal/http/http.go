@@ -5,6 +5,7 @@ import (
 	"emailer/internal/domain"
 	"emailer/internal/logger"
 	"encoding/json"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
 	"github.com/google/uuid"
@@ -78,11 +79,13 @@ func (h *handler) send(ctx *fiber.Ctx) error {
 	var data domain.Payload
 	err := json.Unmarshal(ctx.Body(), &data)
 	if err != nil {
+		err := fmt.Errorf("send handler unmarshal err, received %v; %w", string(ctx.Body()), err)
 		h.errCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
 	err = h.Do(ctx.Context(), data)
 	if err != nil {
+		err := fmt.Errorf("send handler Do err, received %v; %w", data, err)
 		h.errCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
@@ -103,6 +106,7 @@ func (h *handler) sendAsync(ctx *fiber.Ctx) error {
 	var data domain.Payload
 	err := json.Unmarshal(ctx.Body(), &data)
 	if err != nil {
+		err := fmt.Errorf("sendAsync handler unmarshal err, received %v; %w", string(ctx.Body()), err)
 		h.errCh <- err
 		return ctx.JSON(fiber.Map{"error": err.Error()})
 	}
