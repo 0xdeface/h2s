@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/xhit/go-simple-mail/v2"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -57,13 +56,15 @@ func (e Email) Send(subject string, message []byte, from string, to []string) er
 		SetBody(mail.TextHTML, string(message))
 	return email.Send(smtpClient)
 }
-func NewEmailSender() Email {
+
+func NewEmailSender() (Email, error) {
 	c, err := loadEnv()
 	if err != nil {
-		log.Fatalln(err)
+		return Email{}, err
 	}
-	return Email{c}
+	return Email{c}, nil
 }
+
 func loadEnv() (cfg config, err error) {
 	const (
 		HOST = iota
